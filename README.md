@@ -1,9 +1,6 @@
 # FIU-ATOM-Datathon-COVID-19
 
 * Analysis
-
-
-
+- What are the risk factor?
 * Visualization
-
-1 Make a map with risk profile by neighborhood
+- Make a map with risk profile by neighborhood
