@@ -44,21 +44,20 @@ fig = make_subplots(rows=1, cols=2,
                     specs=[[{'type': 'xy'}, {'type': 'xy'}]])
 # Testing Chart
 fig.add_trace(go.Bar(x=local_counties['attributes.County_1'], y=local_counties['attributes.TPositive'],
-                base=[-500,-600,-700],
                 marker_color='crimson',
-                name='positive'), 1, 1)
+                name='Positive'), 1, 1)
 fig.add_trace(go.Bar(x=local_counties['attributes.County_1'], y=local_counties['attributes.TNegative'],
-                base=[-500,-600,-700],
                 marker_color='green',
-                name='negative'), 1, 1)
+                name='Negative'), 1, 1)
+fig.add_trace(go.Bar(x=local_counties['attributes.County_1'], y=local_counties['attributes.Deaths'],
+                marker_color='grey',
+                name='Deaths'), 1, 1)
 
 # Race Chart
 fig.add_trace(go.Bar(x=local_counties['attributes.County_1'], y=local_counties['attributes.C_RaceWhite'],
-                base=[-500,-600,-700],
                 marker_color='pink',
                 name='White'), 1, 2)
 fig.add_trace(go.Bar(x=local_counties['attributes.County_1'], y=local_counties['attributes.C_RaceBlack'],
-                base=[-500,-600,-700],
                 marker_color='black',
                 name='Black'), 1, 2)
 
