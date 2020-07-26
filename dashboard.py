@@ -3,6 +3,8 @@ import pandas as pd
 import requests
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import plotly.express as px
+import geopandas as gpd
 
 view_picker = st.sidebar.selectbox('Change View', ("Risk Profile", 'Local Covid Tracker'))
 
@@ -21,7 +23,6 @@ else:
 
     state_data_url = "https://services1.arcgis.com/CY1LXxl9zlJeBuRZ/arcgis/rest/services/Florida_COVID19_Case_Line_Data_NEW/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
     county_data_url = 'https://services1.arcgis.com/CY1LXxl9zlJeBuRZ/arcgis/rest/services/Florida_COVID19_Cases/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json'
-
 
     @st.cache
     def getData(api):
@@ -48,7 +49,7 @@ else:
     county_data = pd.json_normalize(county_data)
     county_data = county_data.drop(['attributes.OBJECTID', 'attributes.OBJECTID_12_13', 'attributes.State',
                                     'attributes.COUNTYNAME', 'attributes.DEPCODE', 'attributes.COUNTY',
-                                    'geometry.rings', 'attributes.Shape__Length', 'attributes.Shape__Area'], axis=1)
+                                    'attributes.Shape__Length', 'attributes.Shape__Area'], axis=1)
 
     if county_picker != "All":
         # State Data
@@ -129,3 +130,35 @@ else:
                       )
                       )
     st.plotly_chart(fig)
+
+
+geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
+geo_json_data = gpd.read_file(geo_json_url)
+geo_json_data['COUNTY'] = geo_json_data['COUNTY'].apply(lambda x: int(str('12') + str(x)))
+geo_json_data['COUNTY'] = geo_json_data['COUNTY'].replace([12025],12086)
+
+broward = geo_json_data['County_1'] == 'Broward'
+dade = geo_json_data['County_1'] == 'Dade'
+collier = geo_json_data['County_1'] == 'Collier'
+monroe = geo_json_data['County_1'] == 'Monroe'
+local_counties_county = pd.DataFrame()
+local_counties_county = local_counties_county.append(geo_json_data[broward], ignore_index=True)
+local_counties_county = local_counties_county.append(geo_json_data[dade], ignore_index=True)
+local_counties_county = local_counties_county.append(geo_json_data[collier], ignore_index=True)
+local_counties_county = local_counties_county.append(geo_json_data[monroe], ignore_index=True)
+
+fig = px.choropleth(local_counties_county, geojson=counties, locations='COUNTY', color='Deaths',
+                           color_continuous_scale="Viridis", hover_name='COUNTYNAME',
+                           hover_data=["T_positive", "T_negative"],
+                           range_color=(0, 1000),
+                           scope="usa"
+                          )
+fig.update_layout(
+    margin={"r":0,"t":0,"l":0,"b":0}
+)
+fig.update_geos(
+    projection={'scale':8},
+    center={'lat': 27.6648, 'lon': -81.5158},
+    visible=False
+)
+fig.show()
