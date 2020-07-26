@@ -6,6 +6,7 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 import geopandas as gpd
 
+# Select box to switch between the two pages
 view_picker = st.sidebar.selectbox('Change View', ("Risk Profile", 'Local Covid Tracker'))
 
 if view_picker == 'Risk Profile':
@@ -23,6 +24,7 @@ else:
 
     state_data_url = "https://services1.arcgis.com/CY1LXxl9zlJeBuRZ/arcgis/rest/services/Florida_COVID19_Case_Line_Data_NEW/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
     county_data_url = 'https://services1.arcgis.com/CY1LXxl9zlJeBuRZ/arcgis/rest/services/Florida_COVID19_Cases/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json'
+    geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
 
     @st.cache
     def getData(api):
@@ -37,6 +39,8 @@ else:
     # Getting the data
     state_data = getData(state_data_url)
     county_data = getData(county_data_url)
+    counties = getData('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json').json()
+    geo_json_data = gpd.read_file(geo_json_url)
 
     # State Data Preprocessing
     state_data = state_data.json()['features']
@@ -132,9 +136,9 @@ else:
     st.plotly_chart(fig)
 
 
-geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
-counties = getData('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
-geo_json_data = gpd.read_file(geo_json_url)
+
+
+
 
 geo_json_data['COUNTY'] = geo_json_data['COUNTY'].apply(lambda x: int(str('12') + str(x)))
 geo_json_data['COUNTY'] = geo_json_data['COUNTY'].replace([12025],12086)
