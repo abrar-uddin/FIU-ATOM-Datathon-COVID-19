@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
 import requests
-import json
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import plotly.express as px
 
 county_picker = st.sidebar.selectbox('Select County',
                                      ("Dade", 'Broward', 'Collier', 'All')
