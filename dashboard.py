@@ -27,8 +27,8 @@ else:
     @st.cache
     def getData(api):
         try:
-            data = requests.get(api)
-            return data
+            with requests.get(api) as data:
+                return data
         except:
             st.write('## **API DOWN!**')
 
@@ -133,7 +133,9 @@ else:
 
 
 geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
+counties = getData('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
 geo_json_data = gpd.read_file(geo_json_url)
+
 geo_json_data['COUNTY'] = geo_json_data['COUNTY'].apply(lambda x: int(str('12') + str(x)))
 geo_json_data['COUNTY'] = geo_json_data['COUNTY'].replace([12025],12086)
 
