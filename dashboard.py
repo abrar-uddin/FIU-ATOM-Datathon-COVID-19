@@ -78,7 +78,8 @@ else:
     else:
         fig = go.Figure()
         fig = make_subplots(rows=2, cols=2,
-                            specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}]])
+                            specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}]],
+                            subplot_titles=('','','Testing Results', 'Cases by Race'))
 
         # Indicator
         fig.add_trace(go.Indicator(
@@ -131,7 +132,8 @@ else:
                             color_continuous_scale="Viridis", hover_name='COUNTYNAME',
                             hover_data=["T_positive", "T_negative"],
                             range_color=(0, 1000),
-                            scope="usa"
+                            scope="usa",
+                            title="Map View"
                             )
         fig.update_geos(
             projection={'scale': 6},
