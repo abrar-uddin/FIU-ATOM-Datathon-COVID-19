@@ -59,7 +59,7 @@ else:
     # Multiselect box
     county_picker = st.sidebar.multiselect('Select County',
                                            list(county_data['County_1'].sort_values()),
-                                           ['Dade', 'Broward']
+                                           ['Dade', 'Broward', 'Monroe', 'Collier']
                                            )
     if "State" in county_picker:
         local_counties_county = pd.DataFrame()
