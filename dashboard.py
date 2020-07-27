@@ -18,6 +18,7 @@ if view_picker == 'Risk Profile':
     pass
 else:
     st.title('Local COVID-19 Tracker')
+    st.subheader("Select \"State\" to view the entire State data")
 
     state_data_url = "https://services1.arcgis.com/CY1LXxl9zlJeBuRZ/arcgis/rest/services/Florida_COVID19_Case_Line_Data_NEW/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
     county_geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
@@ -76,8 +77,8 @@ else:
         st.write('## **Select a county**')
     else:
         fig = go.Figure()
-        fig = make_subplots(rows=2, cols=3,
-                            specs=[[{'type': 'domain'}, {'type': 'domain', 'rowspan': 2}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}, None]])
+        fig = make_subplots(rows=2, cols=2,
+                            specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}]])
 
         # Indicator
         fig.add_trace(go.Indicator(
@@ -132,9 +133,6 @@ else:
                             range_color=(0, 1000),
                             scope="usa"
                             )
-        fig.update_layout(
-            margin={"r": 0, "t": 0, "l": 0, "b": 0}
-        )
         fig.update_geos(
             projection={'scale': 6},
             center={'lat': 27.6648, 'lon': -81.5158},
