@@ -10,6 +10,7 @@ import geopandas as gpd
 # Select box to switch between the two pages
 view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
                                                    'Local Covid Tracker'))
+
 if view_picker == 'Risk Profile Survey':
     components.iframe(
         'https://docs.google.com/forms/d/e/1FAIpQLSdkgGD1FK7c6ZcGAQP4lavawr_yxczSdDAbpzXarZymPpJvLA/viewform?embedded=true',
@@ -27,6 +28,10 @@ elif view_picker == 'Risk Profile':
     # TODO: compare risk profiles by college, county, etc
     # TODO: WE GOT THIS!
     panther_id = st.sidebar.text_input("Panther ID:")
+    components.iframe(
+        'https://app.powerbi.com/reportEmbed?reportId=06fcde25-21e2-4178-96e6-93353054e787&autoAuth=true&ctid=ac79e5a8-e0e4-434b-a292-2c89b5c28366&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9',
+        scrolling=True,
+        height=800)
     pass
 elif view_picker == 'Local Covid Tracker':
     st.title('Local COVID-19 Tracker')
@@ -93,7 +98,7 @@ elif view_picker == 'Local Covid Tracker':
         fig = make_subplots(rows=3, cols=2,
                             specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}],
                                    [{'type': 'xy', 'colspan': 2}, None]],
-                            subplot_titles=('', '', 'Testing Results', 'Cases by Race'))
+                            subplot_titles=('', '', 'Testing Results', 'Cases by Race', "Cases by Race"))
 
         # Indicator
         fig.add_trace(go.Indicator(
