@@ -154,3 +154,20 @@ elif view_picker == 'Local Covid Tracker':
             visible=False
         )
         st.plotly_chart(fig)
+
+        t1 = local_counties_county['Age_0_4'].sum()
+        t2 = local_counties_county['Age_5_14'].sum()
+        t3 = local_counties_county['Age_15_24'].sum()
+        t4 = local_counties_county['Age_25_34'].sum()
+        t5 = local_counties_county['Age_35_44'].sum()
+        t6 = local_counties_county['Age_45_54'].sum()
+        t7 = local_counties_county['Age_55_64'].sum()
+        t8 = local_counties_county['Age_65_74'].sum()
+
+        age = ['Age:0-4', 'Age:5-14', 'Age:15-24', 'Age:25-34', 'Age:35-44', 'Age:45-54', 'Age:55-64', 'Age:65-74']
+        Cases_by_Age = pd.DataFrame({'Case_Totals': [t1, t2, t3, t4, t5, t6, t7, t8], 'Age_Group': age})
+        colors = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'skyblue', 'lightpurple']
+        fig2 = px.pie(Cases_by_Age, values="Case_Totals", names='Age_Group', title='Cases by Age Group')
+        fig2.update_traces(hoverinfo='label', textinfo='percent', textfont_size=15,
+                           marker=dict(colors=colors, line=dict(color='#000000', width=1)))
+        st.plotly_chart(fig2)
