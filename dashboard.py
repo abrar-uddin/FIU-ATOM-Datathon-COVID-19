@@ -27,7 +27,6 @@ elif view_picker == 'Risk Profile':
     # TODO: compare risk profiles by college, county, etc
     # TODO: WE GOT THIS!
 
-
     pass
 elif view_picker == 'Local Covid Tracker':
     st.title('Local COVID-19 Tracker')
@@ -46,15 +45,12 @@ elif view_picker == 'Local Covid Tracker':
 
     @st.cache(allow_output_mutation=True)
     def createGPD(api):
-        try:
-            data = gpd.read_file(api)
+        data = gpd.read_file(api)
 
-            # County Data Preprocessing
-            data['COUNTY'] = data['COUNTY'].apply(lambda x: int(str('12') + str(x)))
-            data['COUNTY'] = data['COUNTY'].replace([12025], 12086)
-            return data
-        except:
-            st.write('API Failed')
+        # County Data Preprocessing
+        data['COUNTY'] = data['COUNTY'].apply(lambda x: int(str('12') + str(x)))
+        data['COUNTY'] = data['COUNTY'].replace([12025], 12086)
+        return data
 
 
     # TODO: Remove state data if not used
@@ -62,6 +58,10 @@ elif view_picker == 'Local Covid Tracker':
     state_data = getData(state_data_url)
     county_data = createGPD(county_geo_json_url)
     counties = getData(county_codes_url).json()
+
+    if county_data is None:
+        st.write("API DOWN!")
+        exit(0)
 
     # State Data Preprocessing
     state_data = state_data.json()['features']
@@ -92,7 +92,7 @@ elif view_picker == 'Local Covid Tracker':
         fig = go.Figure()
         fig = make_subplots(rows=2, cols=2,
                             specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}]],
-                            subplot_titles=('','','Testing Results', 'Cases by Race'))
+                            subplot_titles=('', '', 'Testing Results', 'Cases by Race'))
 
         # Indicator
         fig.add_trace(go.Indicator(
