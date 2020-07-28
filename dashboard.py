@@ -90,8 +90,9 @@ elif view_picker == 'Local Covid Tracker':
         st.write('## **Select a county**')
     else:
         fig = go.Figure()
-        fig = make_subplots(rows=2, cols=2,
-                            specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}]],
+        fig = make_subplots(rows=3, cols=2,
+                            specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}],
+                                   [{'type': 'xy', 'colspan': 2}, None]],
                             subplot_titles=('', '', 'Testing Results', 'Cases by Race'))
 
         # Indicator
@@ -131,6 +132,11 @@ elif view_picker == 'Local Covid Tracker':
             go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceOther'],
                    marker_color='orchid',
                    name='Other'), 2, 2)
+        # Median Age Chart
+        fig.add_trace(
+            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['MedianAge'],
+                   marker_color='darkturquoise',
+                   name='Median Age'), 3, 1)
         fig.update_layout(height=800, width=800,
                           legend=dict(
                               yanchor="top",
@@ -139,20 +145,6 @@ elif view_picker == 'Local Covid Tracker':
                               x=1
                           )
                           )
-        st.plotly_chart(fig)
-
-        fig = px.choropleth(local_counties_county, geojson=counties, locations='COUNTY', color='Deaths',
-                            color_continuous_scale="Viridis", hover_name='COUNTYNAME',
-                            hover_data=["T_positive", "T_negative"],
-                            range_color=(0, 1000),
-                            scope="usa",
-                            title="Map View"
-                            )
-        fig.update_geos(
-            projection={'scale': 6},
-            center={'lat': 27.6648, 'lon': -81.5158},
-            visible=False
-        )
         st.plotly_chart(fig)
 
         t1 = local_counties_county['Age_0_4'].sum()
@@ -167,7 +159,22 @@ elif view_picker == 'Local Covid Tracker':
         age = ['Age:0-4', 'Age:5-14', 'Age:15-24', 'Age:25-34', 'Age:35-44', 'Age:45-54', 'Age:55-64', 'Age:65-74']
         Cases_by_Age = pd.DataFrame({'Case_Totals': [t1, t2, t3, t4, t5, t6, t7, t8], 'Age_Group': age})
         colors = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'skyblue', 'lightpurple']
-        fig2 = px.pie(Cases_by_Age, values="Case_Totals", names='Age_Group', title='Cases by Age Group')
-        fig2.update_traces(hoverinfo='label', textinfo='percent', textfont_size=15,
-                           marker=dict(colors=colors, line=dict(color='#000000', width=1)))
-        st.plotly_chart(fig2)
+        fig = px.pie(Cases_by_Age, values="Case_Totals", names='Age_Group', title='Cases by Age Group')
+        fig.update_traces(hoverinfo='label', textinfo='percent', textfont_size=15,
+                          marker=dict(colors=colors, line=dict(color='#000000', width=1)))
+        st.plotly_chart(fig)
+
+        map_data = st.selectbox("Map Select:", (
+            'Deaths', "T_positive", "T_negative", "MedianAge", 'C_RaceWhite', 'C_RaceBlack', 'C_RaceOther'), 0)
+        fig = px.choropleth(local_counties_county, geojson=counties, locations='COUNTY', color=map_data,
+                            color_continuous_scale="Viridis", hover_name='COUNTYNAME',
+                            hover_data=["T_positive", "T_negative"],
+                            scope="usa",
+                            title="Map View"
+                            )
+        fig.update_geos(
+            projection={'scale': 6},
+            center={'lat': 27.6648, 'lon': -81.5158},
+            visible=False
+        )
+        st.plotly_chart(fig)
