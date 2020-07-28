@@ -8,10 +8,16 @@ import plotly.express as px
 import geopandas as gpd
 
 # Select box to switch between the two pages
-view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Risk Profile", 'Local Covid Tracker'))
+view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
+                                                   'Local Covid Tracker'))
 if view_picker == 'Risk Profile Survey':
     components.iframe(
         'https://docs.google.com/forms/d/e/1FAIpQLSdkgGD1FK7c6ZcGAQP4lavawr_yxczSdDAbpzXarZymPpJvLA/viewform?embedded=true',
+        scrolling=True,
+        height=800)
+elif view_picker == 'Daily Risk Profile Survey':
+    components.iframe(
+        'https://docs.google.com/forms/d/e/1FAIpQLSe1RYfDpImWdoHulRn4uYVP5aLnfCxfTwyGBvsplZ4GFugfnQ/viewform?embedded=true',
         scrolling=True,
         height=800)
 elif view_picker == 'Risk Profile':
@@ -23,7 +29,7 @@ elif view_picker == 'Risk Profile':
 
 
     pass
-else:
+elif view_picker == 'Local Covid Tracker':
     st.title('Local COVID-19 Tracker')
     st.subheader("Select \"State\" to view the entire State data")
 
