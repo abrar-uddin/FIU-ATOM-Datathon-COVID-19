@@ -26,7 +26,7 @@ elif view_picker == 'Risk Profile':
     # TODO: need a way to view individual data, dont bother to make it secure; simple pid lookup should be fine
     # TODO: compare risk profiles by college, county, etc
     # TODO: WE GOT THIS!
-
+    panther_id = st.sidebar.text_input("Panther ID:")
     pass
 elif view_picker == 'Local Covid Tracker':
     st.title('Local COVID-19 Tracker')
