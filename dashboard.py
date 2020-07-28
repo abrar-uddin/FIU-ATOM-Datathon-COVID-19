@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import requests
 import plotly.graph_objects as go
@@ -7,14 +8,20 @@ import plotly.express as px
 import geopandas as gpd
 
 # Select box to switch between the two pages
-view_picker = st.sidebar.selectbox('Change View', ("Risk Profile", 'Local Covid Tracker'))
-
-if view_picker == 'Risk Profile':
+view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Risk Profile", 'Local Covid Tracker'))
+if view_picker == 'Risk Profile Survey':
+    components.iframe(
+        'https://docs.google.com/forms/d/e/1FAIpQLSdkgGD1FK7c6ZcGAQP4lavawr_yxczSdDAbpzXarZymPpJvLA/viewform?embedded=true',
+        scrolling=True,
+        height=800)
+elif view_picker == 'Risk Profile':
     st.title('Risk Profile')
     # TODO: put the risk profile code here
     # TODO: need a way to view individual data, dont bother to make it secure; simple pid lookup should be fine
     # TODO: compare risk profiles by college, county, etc
     # TODO: WE GOT THIS!
+
+
     pass
 else:
     st.title('Local COVID-19 Tracker')
