@@ -39,10 +39,24 @@ elif view_picker == 'Local Covid Tracker':
     st.title('Local COVID-19 Tracker')
     st.subheader("Select \"State\" to view the entire State data")
 
-    state_geo_json_url = "https://opendata.arcgis.com/datasets/37abda537d17458bae6677b8ab75fcb9_0.geojson"
+    # TODO: API went down remove if it never comes back up
+    # state_geo_json_url = "https://opendata.arcgis.com/datasets/37abda537d17458bae6677b8ab75fcb9_0.geojson"
     county_geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
     county_codes_url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
 
+    # with requests.get(state_geo_json_url) as test:
+    #     test = test
+    #
+    # if test.status_code != 200:
+    #     st.error("API DOWN!")
+    #     exit(0)
+
+    with requests.get(county_geo_json_url) as test:
+        test = test
+
+    if test.status_code != 200:
+        st.error("API DOWN!")
+        exit(0)
 
     @st.cache
     def getData(api):
@@ -52,6 +66,7 @@ elif view_picker == 'Local Covid Tracker':
 
     @st.cache(allow_output_mutation=True)
     def createGPD(api):
+
         data = gpd.read_file(api)
 
         if api is county_geo_json_url:
@@ -63,13 +78,9 @@ elif view_picker == 'Local Covid Tracker':
 
 
     # Getting the data
-    state_data = createGPD(state_geo_json_url)
+    # state_data = createGPD(state_geo_json_url)
     county_data = createGPD(county_geo_json_url)
     counties = getData(county_codes_url).json()
-
-    if county_data is None:
-        st.write("API DOWN!")
-        exit(0)
 
     # Multiselect box
     county_picker = st.sidebar.multiselect('Select County',
@@ -168,17 +179,17 @@ elif view_picker == 'Local Covid Tracker':
         st.plotly_chart(fig)
 
         # Daily Cases Count
-        df = {"count": state_data['EventDate']}
-        case_timeline = pd.DataFrame(data=df)
-        case_timeline['count'] = pd.to_datetime(case_timeline['count'])
-        case_timeline['date_minus_time'] = case_timeline["count"].apply(lambda case_timeline:
-                                                                        datetime.datetime(year=case_timeline.year,
-                                                                                          month=case_timeline.month,
-                                                                                          day=case_timeline.day))
-        daily_cases = case_timeline.groupby('date_minus_time').count()
-        fig = px.line(daily_cases, x=daily_cases.index, y='count', title='Daily Cases Count',
-                      labels={'date_minus_time': "Date", 'count': 'Count'})
-        st.plotly_chart(fig)
+        # df = {"count": state_data['EventDate']}
+        # case_timeline = pd.DataFrame(data=df)
+        # case_timeline['count'] = pd.to_datetime(case_timeline['count'])
+        # case_timeline['date_minus_time'] = case_timeline["count"].apply(lambda case_timeline:
+        #                                                                 datetime.datetime(year=case_timeline.year,
+        #                                                                                   month=case_timeline.month,
+        #                                                                                   day=case_timeline.day))
+        # daily_cases = case_timeline.groupby('date_minus_time').count()
+        # fig = px.line(daily_cases, x=daily_cases.index, y='count', title='Daily Cases Count',
+        #               labels={'date_minus_time': "Date", 'count': 'Count'})
+        # st.plotly_chart(fig)
 
         map_data = st.selectbox("Map Select:", (
             'Deaths', "T_positive", "T_negative", "MedianAge", 'C_RaceWhite', 'C_RaceBlack', 'C_RaceOther'), 0)
