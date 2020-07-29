@@ -10,7 +10,7 @@ import datetime
 
 # Select box to switch between the two pages
 view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
-                                                   'Local COVID-19 Cases Analysis', "Florida COVID-19 Dashboard"))
+                                                   'Local COVID-19 Cases Analysis'))
 
 if view_picker == 'Risk Profile Survey':
     components.iframe(
@@ -221,10 +221,3 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
             visible=False
         )
         st.plotly_chart(fig)
-elif view_picker == "Florida COVID-19 Dashboard":
-    # TODO: embed the covid dash here
-    components.iframe(
-        'https://public.tableau.com/views/FarenetAnomalies/AnomaliesDashboard?:showVizHome=no&:embed=true',
-        scrolling=True,
-        height=900,
-        width=1500)
