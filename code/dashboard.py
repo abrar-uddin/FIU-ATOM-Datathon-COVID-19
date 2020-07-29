@@ -29,9 +29,10 @@ elif view_picker == 'Risk Profile':
     # TODO: WE GOT THIS!
     panther_id = st.sidebar.text_input("Panther ID:")
     components.iframe(
-        'https://app.powerbi.com/reportEmbed?reportId=06fcde25-21e2-4178-96e6-93353054e787&autoAuth=true&ctid=ac79e5a8-e0e4-434b-a292-2c89b5c28366&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXVzLWVhc3QyLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9',
+        'https://public.tableau.com/views/FarenetAnomalies/AnomaliesDashboard?:showVizHome=no&:embed=true',
         scrolling=True,
-        height=800)
+        height=900,
+        width=1500)
     pass
 elif view_picker == 'Local Covid Tracker':
     st.title('Local COVID-19 Tracker')
