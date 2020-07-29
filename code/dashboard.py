@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
 import geopandas as gpd
+import datetime
 
 # Select box to switch between the two pages
 view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
@@ -38,7 +39,7 @@ elif view_picker == 'Local Covid Tracker':
     st.title('Local COVID-19 Tracker')
     st.subheader("Select \"State\" to view the entire State data")
 
-    state_data_url = "https://services1.arcgis.com/CY1LXxl9zlJeBuRZ/arcgis/rest/services/Florida_COVID19_Case_Line_Data_NEW/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+    state_geo_json_url = "https://opendata.arcgis.com/datasets/37abda537d17458bae6677b8ab75fcb9_0.geojson"
     county_geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
     county_codes_url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
 
@@ -53,27 +54,22 @@ elif view_picker == 'Local Covid Tracker':
     def createGPD(api):
         data = gpd.read_file(api)
 
-        # County Data Preprocessing
-        data['COUNTY'] = data['COUNTY'].apply(lambda x: int(str('12') + str(x)))
-        data['COUNTY'] = data['COUNTY'].replace([12025], 12086)
+        if api is county_geo_json_url:
+            # County Data Preprocessing
+            data['COUNTY'] = data['COUNTY'].apply(lambda x: int(str('12') + str(x)))
+            data['COUNTY'] = data['COUNTY'].replace([12025], 12086)
+
         return data
 
 
-    # TODO: Remove state data if not used
     # Getting the data
-    state_data = getData(state_data_url)
+    state_data = createGPD(state_geo_json_url)
     county_data = createGPD(county_geo_json_url)
     counties = getData(county_codes_url).json()
 
     if county_data is None:
         st.write("API DOWN!")
         exit(0)
-
-    # State Data Preprocessing
-    state_data = state_data.json()['features']
-    state_data = pd.json_normalize(state_data)
-    state_data = state_data.drop(['attributes.Case1', 'attributes.EventDate', 'attributes.ChartDate',
-                                  'attributes.ObjectId'], axis=1)
 
     # Multiselect box
     county_picker = st.sidebar.multiselect('Select County',
@@ -99,7 +95,7 @@ elif view_picker == 'Local Covid Tracker':
         fig = make_subplots(rows=3, cols=2,
                             specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}],
                                    [{'type': 'xy', 'colspan': 2}, None]],
-                            subplot_titles=('', '', 'Testing Results', 'Cases by Race', "Cases by Race"))
+                            subplot_titles=('', '', 'Testing Results', 'Cases by Race', "Median Age"))
 
         # Indicator
         fig.add_trace(go.Indicator(
@@ -153,6 +149,7 @@ elif view_picker == 'Local Covid Tracker':
                           )
         st.plotly_chart(fig)
 
+        # Age group pie chart
         t1 = local_counties_county['Age_0_4'].sum()
         t2 = local_counties_county['Age_5_14'].sum()
         t3 = local_counties_county['Age_15_24'].sum()
@@ -168,6 +165,19 @@ elif view_picker == 'Local Covid Tracker':
         fig = px.pie(Cases_by_Age, values="Case_Totals", names='Age_Group', title='Cases by Age Group')
         fig.update_traces(hoverinfo='label', textinfo='percent', textfont_size=15,
                           marker=dict(colors=colors, line=dict(color='#000000', width=1)))
+        st.plotly_chart(fig)
+
+        # Daily Cases Count
+        df = {"count": state_data['EventDate']}
+        case_timeline = pd.DataFrame(data=df)
+        case_timeline['count'] = pd.to_datetime(case_timeline['count'])
+        case_timeline['date_minus_time'] = case_timeline["count"].apply(lambda case_timeline:
+                                                                        datetime.datetime(year=case_timeline.year,
+                                                                                          month=case_timeline.month,
+                                                                                          day=case_timeline.day))
+        daily_cases = case_timeline.groupby('date_minus_time').count()
+        fig = px.line(daily_cases, x=daily_cases.index, y='count', title='Daily Cases Count',
+                      labels={'date_minus_time': "Date", 'count': 'Count'})
         st.plotly_chart(fig)
 
         map_data = st.selectbox("Map Select:", (
