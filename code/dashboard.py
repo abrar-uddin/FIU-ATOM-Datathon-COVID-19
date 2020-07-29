@@ -10,7 +10,7 @@ import datetime
 
 # Select box to switch between the two pages
 view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
-                                                   'Local Covid Tracker'))
+                                                   'Local COVID-19 Cases Analysis', "Florida COVID-19 Dashboard"))
 
 if view_picker == 'Risk Profile Survey':
     components.iframe(
@@ -34,22 +34,20 @@ elif view_picker == 'Risk Profile':
         scrolling=True,
         height=900,
         width=1500)
-    pass
-elif view_picker == 'Local Covid Tracker':
-    st.title('Local COVID-19 Tracker')
-    st.subheader("Select \"State\" to view the entire State data")
+elif view_picker == 'Local COVID-19 Cases Analysis':
+    st.title('Local COVID-19 Cases Analysis')
+    st.info("Select \"State\" to view the entire State data")
 
-    # TODO: API went down remove if it never comes back up
-    # state_geo_json_url = "https://opendata.arcgis.com/datasets/37abda537d17458bae6677b8ab75fcb9_0.geojson"
+    state_geo_json_url = "https://opendata.arcgis.com/datasets/37abda537d17458bae6677b8ab75fcb9_0.geojson"
     county_geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
     county_codes_url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
 
-    # with requests.get(state_geo_json_url) as test:
-    #     test = test
-    #
-    # if test.status_code != 200:
-    #     st.error("API DOWN!")
-    #     exit(0)
+    with requests.get(state_geo_json_url) as test:
+        test = test
+
+    if test.status_code != 200:
+        st.error("API DOWN!")
+        exit(0)
 
     with requests.get(county_geo_json_url) as test:
         test = test
@@ -57,6 +55,7 @@ elif view_picker == 'Local Covid Tracker':
     if test.status_code != 200:
         st.error("API DOWN!")
         exit(0)
+
 
     @st.cache
     def getData(api):
@@ -78,7 +77,7 @@ elif view_picker == 'Local Covid Tracker':
 
 
     # Getting the data
-    # state_data = createGPD(state_geo_json_url)
+    state_data = createGPD(state_geo_json_url)
     county_data = createGPD(county_geo_json_url)
     counties = getData(county_codes_url).json()
 
@@ -102,6 +101,10 @@ elif view_picker == 'Local Covid Tracker':
     if not county_picker:
         st.write('## **Select a county**')
     else:
+        '''
+        Our analysis on the local covid-19 cases used data gathered from the Florida COVID-19 
+        [data api](https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-cases-by-county).
+        '''
         fig = go.Figure()
         fig = make_subplots(rows=3, cols=2,
                             specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}],
@@ -160,6 +163,13 @@ elif view_picker == 'Local Covid Tracker':
                           )
         st.plotly_chart(fig)
 
+        "From the charts above we can see that there is a significant amount of positive test cases" \
+        "in the area. With schools reopening this Fall this is concerning news that should be taken in to " \
+        "consideration. What is concerning is from the data we have seen that the largest age group is that" \
+        "has been affected are adults above the age of 25 years old. Which indicates that school aged" \
+        "indivuals have not been exposed to the virus due to quarentine efforts. We may see a change in this" \
+        "trend if schools are not prepared to handle large amounts of on campus students."
+
         # Age group pie chart
         t1 = local_counties_county['Age_0_4'].sum()
         t2 = local_counties_county['Age_5_14'].sum()
@@ -178,18 +188,24 @@ elif view_picker == 'Local Covid Tracker':
                           marker=dict(colors=colors, line=dict(color='#000000', width=1)))
         st.plotly_chart(fig)
 
+        '''
+        The daily number of cases timeline is showing that from July 11 we have seen a drop in the number
+        of cases. Although we are still lacking data we need can see a preliminary signs of a downward
+        trend in the number of cases per day. In the coming months this is something to monitor closely
+        so that FIU may respond with an influx in cases appropriately. 
+        '''
         # Daily Cases Count
-        # df = {"count": state_data['EventDate']}
-        # case_timeline = pd.DataFrame(data=df)
-        # case_timeline['count'] = pd.to_datetime(case_timeline['count'])
-        # case_timeline['date_minus_time'] = case_timeline["count"].apply(lambda case_timeline:
-        #                                                                 datetime.datetime(year=case_timeline.year,
-        #                                                                                   month=case_timeline.month,
-        #                                                                                   day=case_timeline.day))
-        # daily_cases = case_timeline.groupby('date_minus_time').count()
-        # fig = px.line(daily_cases, x=daily_cases.index, y='count', title='Daily Cases Count',
-        #               labels={'date_minus_time': "Date", 'count': 'Count'})
-        # st.plotly_chart(fig)
+        df = {"count": state_data['EventDate']}
+        case_timeline = pd.DataFrame(data=df)
+        case_timeline['count'] = pd.to_datetime(case_timeline['count'])
+        case_timeline['date_minus_time'] = case_timeline["count"].apply(lambda case_timeline:
+                                                                        datetime.datetime(year=case_timeline.year,
+                                                                                          month=case_timeline.month,
+                                                                                          day=case_timeline.day))
+        daily_cases = case_timeline.groupby('date_minus_time').count()
+        fig = px.line(daily_cases, x=daily_cases.index, y='count', title='Daily Cases Count',
+                      labels={'date_minus_time': "Date", 'count': 'Count'})
+        st.plotly_chart(fig)
 
         map_data = st.selectbox("Map Select:", (
             'Deaths', "T_positive", "T_negative", "MedianAge", 'C_RaceWhite', 'C_RaceBlack', 'C_RaceOther'), 0)
@@ -205,3 +221,10 @@ elif view_picker == 'Local Covid Tracker':
             visible=False
         )
         st.plotly_chart(fig)
+elif view_picker == "Florida COVID-19 Dashboard":
+    # TODO: embed the covid dash here
+    components.iframe(
+        'https://public.tableau.com/views/FarenetAnomalies/AnomaliesDashboard?:showVizHome=no&:embed=true',
+        scrolling=True,
+        height=900,
+        width=1500)
