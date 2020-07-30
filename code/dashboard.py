@@ -8,9 +8,16 @@ import plotly.express as px
 import geopandas as gpd
 import datetime
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+
+import geoplot as gplt
+
+
 # Select box to switch between the two pages
 view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
-                                                   'Local COVID-19 Cases Analysis'))
+                                                   'Local COVID-19 Cases Analysis', 'test'))
 
 if view_picker == 'Risk Profile Survey':
     components.iframe(
@@ -41,6 +48,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     state_geo_json_url = "https://opendata.arcgis.com/datasets/37abda537d17458bae6677b8ab75fcb9_0.geojson"
     county_geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
     county_codes_url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
+    fl_demo_url = 'https://opendata.arcgis.com/datasets/61a30fb3ea4c43e4854fbb4c1be57394_0.geojson'
 
     with requests.get(state_geo_json_url) as test:
         test = test
@@ -80,6 +88,21 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     state_data = createGPD(state_geo_json_url)
     county_data = createGPD(county_geo_json_url)
     counties = getData(county_codes_url).json()
+    fl_demo = createGPD(fl_demo_url)
+
+    # Environmental/Disease Data
+    fdoh_data = pd.read_csv('C:/Users/uddin/Downloads/FIU-ATOM-Datathon-COVID-19/data/fdoh-data.csv')
+    fdoh_data = fdoh_data.drop([0]).rename(columns={'Unnamed: 0': 'County', 'Unnamed: 1': "FIPS"})
+    df = county_data[['County_1', 'SHAPE_Length', 'SHAPE_Area', 'geometry']].rename(
+        columns={'County_1': 'County'})
+    fdoh_data = pd.merge(fdoh_data, df, on='County')
+    fdoh_data['FIPS'] = fdoh_data['FIPS'].apply(lambda x: x.replace('-', ''))
+
+    # fl_demo.head(2)
+    #
+    # county_data.head(2)
+    #
+    # fdoh_data.head(2)
 
     # Multiselect box
     county_picker = st.sidebar.multiselect('Select County',
@@ -221,3 +244,165 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
             visible=False
         )
         st.plotly_chart(fig)
+
+        '''
+            # Assumptions
+
+            Dade and Broward are the most populated areas in Flordia as such we need to take that in to account as we analyze our data.
+            '''
+
+        gplt.choropleth(
+            fl_demo, hue='TotalPopul',
+            cmap='Reds', figsize=(14, 5),
+            legend=True,
+            edgecolor='white'
+        )
+        plt.title('Total Population')
+        st.pyplot()
+        '''
+        # Age
+
+        Most public health organizations have stated that age is a key indicator of how sick a paitient may get from COVID-19. 60 up tends to be the general age where COVID can pose a high life threatening issue.
+        '''
+
+        gplt.choropleth(
+            fl_demo, hue='Pop_65andO',
+            cmap='Blues', figsize=(14, 5),
+            legend=True,
+            edgecolor='white'
+        )
+        plt.title('Population Over the Age of 65')
+        st.pyplot()
+
+        '''
+        From this chart we can see that the two counties near FIU Broward and Dade have the largest population of people over the age of 65. One thing to note is that the data used was collected 5 years ago.
+        '''
+
+        sns.barplot(x=['0-4', '5-14', '15-24', '25-34', '35-44', '45-54', '55-64', '65-74', '85plus'],
+                    y=[county_data['Age_0_4'].sum(), county_data['Age_5_14'].sum(), county_data['Age_15_24'].sum(),
+                       county_data['Age_25_34'].sum(), county_data['Age_35_44'].sum(), county_data['Age_45_54'].sum(),
+                       county_data['Age_55_64'].sum(), county_data['Age_65_74'].sum(), county_data['Age_85plus'].sum()])
+        plt.title('Covid Cases by Age')
+        st.pyplot()
+
+        fig = px.choropleth(county_data, geojson=counties, locations='COUNTY', color='T_positive',
+                            color_continuous_scale="Viridis", hover_name='COUNTYNAME',
+                            hover_data=['Age_0_4', 'Age_5_14', 'Age_25_34', 'Age_35_44', 'Age_45_54', 'Age_55_64',
+                                        'Age_65_74', 'Age_85plus'],
+                            scope="usa",
+                            title="Positive Test Cases",
+                            range_color=(0, 10000)
+                            )
+        fig.update_geos(
+            projection={'scale': 4},
+            center={'lat': 27.6648, 'lon': -81.5158},
+            visible=False
+        )
+        st.plotly_chart(fig)
+
+        '''
+        From the data we can see that the largest age range that has tested positive for COVID-19 is 25 up but more importantly the area aroud FIU is a hotspot. As such taking age in to considerations people older that 60 should remain in quarantine with schools opening we will see an influx in cases starting at a much younger age which could have unforeseen consequences.
+
+        # Ethnicity
+
+        According to the CDC there does exist a inequality in the system which puts minorities at a higher risk for contracting the virus. This can be due to multiple reasons such as discrimination, healthcare access, occupation, education, housing or all of the above.
+        '''
+
+        sns.barplot(x=['White', 'Black', 'Hispanic', 'Other'],
+                    y=[county_data['C_RaceWhite'].sum() - county_data['C_HispanicYES'].sum(),
+                       county_data['C_RaceBlack'].sum(), county_data['C_HispanicYES'].sum(),
+                       county_data['C_RaceOther'].sum()])
+        plt.title('Covid Cases by Race')
+        st.pyplot()
+
+        minority = county_data['C_RaceBlack'] + county_data['C_HispanicYES'] + county_data['C_RaceOther']
+        county_data['Minority'] = minority
+
+        fig = px.choropleth(county_data, geojson=counties, locations='COUNTY', color='Minority',
+                            color_continuous_scale="Viridis", hover_name='COUNTYNAME',
+                            hover_data=['T_positive'],
+                            scope="usa",
+                            title="Minority Cases",
+                            range_color=(0, 20000)
+                            )
+        fig.update_geos(
+            projection={'scale': 4},
+            center={'lat': 27.6648, 'lon': -81.5158},
+            visible=False
+        )
+        st.plotly_chart(fig)
+
+        '''
+        We can see from the map that the minority cases near FIU is the highest in the State. With FIU serving primarily minorities this puts our campus at a higher risk of being hot spot for the spread of the virus if proper precautions are not taken. With the cases of Miami-Dade and Broward with the highest concentration.
+
+        # Respiratory Diseases
+        '''
+
+        fig = px.choropleth(fdoh_data, geojson=counties, locations='FIPS', color='Number of COPD Hospitalizations',
+                            color_continuous_scale="Viridis", hover_name='County',
+                            hover_data=[],
+                            scope="usa",
+                            title='Number of COPD Hospitalizations',
+                            labels={'Number of COPD Hospitalizations': 'COPD Cases'}
+                            )
+        fig.update_geos(
+            projection={'scale': 4},
+            center={'lat': 27.6648, 'lon': -81.5158},
+            visible=False
+        )
+        st.plotly_chart(fig)
+        st.write("*Chronic obstructive pulmonary disease (COPD)")
+
+        fig = px.choropleth(fdoh_data, geojson=counties, locations='FIPS',
+                            color='Number of Asthma Emergency Department Visits',
+                            color_continuous_scale="Viridis", hover_name='County',
+                            hover_data=[],
+                            scope="usa",
+                            title='Number of Asthma Emergency Department Visits',
+                            labels={'Number of Asthma Emergency Department Visits': 'Asthma Cases'}
+                            )
+        fig.update_geos(
+            projection={'scale': 4},
+            center={'lat': 27.6648, 'lon': -81.5158},
+            visible=False
+        )
+        st.plotly_chart(fig)
+
+        fig = px.choropleth(fdoh_data, geojson=counties, locations='FIPS', color='Number of Asthma Hospitalizations',
+                            color_continuous_scale="Viridis", hover_name='County',
+                            hover_data=[],
+                            scope="usa",
+                            title='Number of Asthma Hospitalizations',
+                            labels={'Number of Asthma Hospitalizations': 'Asthma Cases'}
+                            )
+        fig.update_geos(
+            projection={'scale': 4},
+            center={'lat': 27.6648, 'lon': -81.5158},
+            visible=False
+        )
+        st.plotly_chart(fig)
+
+        '''
+        The concentration of respitatory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
+        '''
+
+        '''
+        # Reference
+        
+        https://dai-global-digital.com/covid-19-data-analysis-part-1-demography-behavior-and-environment.html#Factor-1:-Age
+        
+        https://dai-global-digital.com/covid-19-data-analysis-part-2-health-capacity-and-preparedness.html
+        
+        https://catalyst.nejm.org/doi/full/10.1056/CAT.20.0116
+        
+        https://www.cdc.gov/coronavirus/2019-ncov/community/health-equity/race-ethnicity.html
+        
+        https://www.floridatracking.com/healthtracking/mapview.htm?i=5250&g=3&t=2018&ta=0&it=1
+    
+        # Data Source
+    
+        ### Data API
+        https://hub.arcgis.com/datasets/61a30fb3ea4c43e4854fbb4c1be57394_0
+        
+        https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-cases-by-county
+        '''
