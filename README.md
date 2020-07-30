@@ -1,17 +1,3 @@
-# FIU-ATOM-Datathon-COVID-19
-
-## Things to do
-
-- Add functionality to switch between the visualized data i.e race,testing positive/neg,pui,gender (see https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-cases-by-county/data?geometry=-125.671%2C20.907%2C-42.044%2C34.477&page=7 for ideas) to local covid tracker
-
-- Create a risk factor by counties column in the data based on age + testing and visualize that goes with prevrious bullet
-
-- Risk factor data visuals
-
-- Anonymize questionnaire to the web app
-
-- Create a dummy login
-
-
-
-# **Meet with a mentor at least once for feedback**
+version https://git-lfs.github.com/spec/v1
+oid sha256:faf5846739aaf38fa19571db821bb63f01e2a62ae68a43f939f41fa77cac5073
+size 590
