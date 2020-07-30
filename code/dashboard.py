@@ -7,6 +7,13 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 import geopandas as gpd
 import datetime
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+#connect to Google Spreadheet
+scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
+client = gspread.authorize(creds)
 
 # Select box to switch between the two pages
 view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
@@ -17,11 +24,21 @@ if view_picker == 'Risk Profile Survey':
         'https://docs.google.com/forms/d/e/1FAIpQLSdkgGD1FK7c6ZcGAQP4lavawr_yxczSdDAbpzXarZymPpJvLA/viewform?embedded=true',
         scrolling=True,
         height=800)
+        sheet = client.open("Test").get_worksheet(1)
+    	data1 = sheet.find("7777777")
+    
+   	 print(data1)
+	 # use data1
 elif view_picker == 'Daily Risk Profile Survey':
     components.iframe(
         'https://docs.google.com/forms/d/e/1FAIpQLSe1RYfDpImWdoHulRn4uYVP5aLnfCxfTwyGBvsplZ4GFugfnQ/viewform?embedded=true',
         scrolling=True,
         height=800)
+    	sheet = client.open("Test").get_worksheet(0) 
+        data2 = sheet.find("john")
+    
+        print(data2)
+        #use data2
 elif view_picker == 'Risk Profile':
     st.title('Risk Profile')
     # TODO: put the risk profile code here
