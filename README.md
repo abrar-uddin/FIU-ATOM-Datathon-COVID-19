@@ -6,9 +6,11 @@
 
 - Create a risk factor by counties column in the data based on age + testing and visualize that goes with prevrious bullet
 
-- Risk factor data visuals + Risk factor look up by PID
+- Risk factor data visuals
 
-- Maybe add questionaire to the web app (would have to do SQL inserts) and create a dummy login
+- Anonymize questionnaire to the web app
+
+- Create a dummy login
 
 
 
