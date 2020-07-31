@@ -1,50 +1,44 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
+
 import requests
+from PIL import Image
+
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
-import geopandas as gpd
-import datetime
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 
-#connect to Google Spreadheet
-scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
-client = gspread.authorize(creds)
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set()
+
+import geopandas as gpd
+import geoplot as gplt
 
 # Select box to switch between the two pages
-view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
-                                                   'Local COVID-19 Cases Analysis'))
+view_picker = st.sidebar.selectbox('Change View', ('Local COVID-19 Cases Analysis',
+                                                   "Risk Profile Dashboard",
+                                                   'Risk Profile Survey',
+                                                   "Daily Risk Profile Survey"
+                                                   )
+                                   )
 
 if view_picker == 'Risk Profile Survey':
     components.iframe(
         'https://docs.google.com/forms/d/e/1FAIpQLSdkgGD1FK7c6ZcGAQP4lavawr_yxczSdDAbpzXarZymPpJvLA/viewform?embedded=true',
         scrolling=True,
         height=800)
-        sheet = client.open("Test").get_worksheet(1)
-    	data1 = sheet.find("7777777")
-    
-   	 print(data1)
-	 # use data1
 elif view_picker == 'Daily Risk Profile Survey':
     components.iframe(
         'https://docs.google.com/forms/d/e/1FAIpQLSe1RYfDpImWdoHulRn4uYVP5aLnfCxfTwyGBvsplZ4GFugfnQ/viewform?embedded=true',
         scrolling=True,
         height=800)
-    	sheet = client.open("Test").get_worksheet(0) 
-        data2 = sheet.find("john")
-    
-        print(data2)
-        #use data2
 elif view_picker == 'Risk Profile':
     st.title('Risk Profile')
     # TODO: put the risk profile code here
-    # TODO: need a way to view individual data, dont bother to make it secure; simple pid lookup should be fine
     # TODO: compare risk profiles by college, county, etc
-    # TODO: WE GOT THIS!
     panther_id = st.sidebar.text_input("Panther ID:")
     components.iframe(
         'https://public.tableau.com/views/FarenetAnomalies/AnomaliesDashboard?:showVizHome=no&:embed=true',
@@ -53,25 +47,24 @@ elif view_picker == 'Risk Profile':
         width=1500)
 elif view_picker == 'Local COVID-19 Cases Analysis':
     st.title('Local COVID-19 Cases Analysis')
-    st.info("Select \"State\" to view the entire State data")
 
-    state_geo_json_url = "https://opendata.arcgis.com/datasets/37abda537d17458bae6677b8ab75fcb9_0.geojson"
     county_geo_json_url = "https://opendata.arcgis.com/datasets/a7887f1940b34bf5a02c6f7f27a5cb2c_0.geojson"
     county_codes_url = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
+    fl_demo_url = 'https://opendata.arcgis.com/datasets/61a30fb3ea4c43e4854fbb4c1be57394_0.geojson'
 
-    with requests.get(state_geo_json_url) as test:
-        test = test
 
-    if test.status_code != 200:
-        st.error("API DOWN!")
-        exit(0)
+    def api_check(url):
+        with requests.get(url) as test:
+            test = test
 
-    with requests.get(county_geo_json_url) as test:
-        test = test
+        if test.status_code != 200:
+            st.error("API DOWN!")
+            exit(0)
 
-    if test.status_code != 200:
-        st.error("API DOWN!")
-        exit(0)
+
+    api_check(county_geo_json_url)
+    api_check(county_codes_url)
+    api_check(fl_demo_url)
 
 
     @st.cache
@@ -93,16 +86,215 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
         return data
 
 
+    @st.cache
+    def make_map():
+        pass
+
+
     # Getting the data
-    state_data = createGPD(state_geo_json_url)
     county_data = createGPD(county_geo_json_url)
     counties = getData(county_codes_url).json()
+    fl_demo = createGPD(fl_demo_url)
 
+    # Environmental/Disease Data
+    fdoh_data = pd.read_csv('../data/fdoh-data.csv')
+    fdoh_data = fdoh_data.drop([0]).rename(columns={'Unnamed: 0': 'County', 'Unnamed: 1': "FIPS"})
+    df = county_data[['County_1', 'SHAPE_Length', 'SHAPE_Area', 'geometry']].rename(
+        columns={'County_1': 'County'})
+    fdoh_data = pd.merge(fdoh_data, df, on='County')
+    fdoh_data['FIPS'] = fdoh_data['FIPS'].apply(lambda x: x.replace('-', ''))
+
+    '''
+    # Objective
+    
+    Our goal as a team is to identify how can students and FIU partner together to help safely open
+    the campus for classes. 
+    # Assumptions
+    
+    In out analysis we will be looking at county level data to see how prevalent the risk factors
+    as announced by the CDC are in our community. Factors such as:
+    - Age
+    - Ethnicity
+    - Respiratory Diseases
+    - Risky Behavior
+    '''
+
+    '''
+    # Age
+
+    Most public health organizations have stated that age is a key indicator of how sick a paitient may get from COVID-19. 60 up tends to be the general age where COVID can pose a high life threatening issue.
+    '''
+
+    gplt.choropleth(
+        fl_demo, hue='TotalPopul',
+        cmap='Reds', figsize=(14, 5),
+        legend=True,
+        edgecolor='white'
+    )
+    plt.title('Total Population')
+    st.pyplot()
+
+    '''
+    Dade and Broward are the most populated areas in Flordia as such we need to take that in to account as we analyze our data.
+    '''
+
+    gplt.choropleth(
+        fl_demo, hue='Pop_65andO',
+        cmap='Blues', figsize=(14, 5),
+        legend=True,
+        edgecolor='white'
+    )
+    plt.title('Population Over the Age of 65')
+    st.pyplot()
+
+    '''
+    From this chart we can see that the two counties near FIU Broward and Dade have the largest population of people over the age of 65. One thing to note is that the data used was collected 5 years ago.
+    '''
+
+    sns.barplot(x=['0-4', '5-14', '15-24', '25-34', '35-44', '45-54', '55-64', '65-74', '85plus'],
+                y=[county_data['Age_0_4'].sum(), county_data['Age_5_14'].sum(), county_data['Age_15_24'].sum(),
+                   county_data['Age_25_34'].sum(), county_data['Age_35_44'].sum(), county_data['Age_45_54'].sum(),
+                   county_data['Age_55_64'].sum(), county_data['Age_65_74'].sum(), county_data['Age_85plus'].sum()])
+    plt.title('Covid Cases by Age')
+    st.pyplot()
+
+    fig = px.choropleth(county_data, geojson=counties, locations='COUNTY', color='T_positive',
+                        color_continuous_scale="Viridis", hover_name='COUNTYNAME',
+                        hover_data=['Age_0_4', 'Age_5_14', 'Age_25_34', 'Age_35_44', 'Age_45_54', 'Age_55_64',
+                                    'Age_65_74', 'Age_85plus'],
+                        scope="usa",
+                        title="Positive Test Cases",
+                        range_color=(0, 10000)
+                        )
+    fig.update_geos(
+        projection={'scale': 4},
+        center={'lat': 27.6648, 'lon': -81.5158},
+        visible=False
+    )
+    st.plotly_chart(fig)
+
+    '''
+    From the data we can see that the largest age range that has tested positive for COVID-19 is 25 up but more importantly the area aroud FIU is a hotspot. As such taking age in to considerations people older that 60 should remain in quarantine with schools opening we will see an influx in cases starting at a much younger age which could have unforeseen consequences.
+
+    # Ethnicity
+
+    According to the CDC there does exist an inequality in the system which puts minorities at a higher risk for contracting the virus. This can be due to multiple reasons such as discrimination, healthcare access, occupation, education, housing or all of the above.
+    '''
+
+    minority = county_data['C_RaceBlack'] + county_data['C_HispanicYES'] + county_data['C_RaceOther']
+
+    sns.barplot(x=['White', 'Black', 'Hispanic', 'Other', 'Combined Minority'],
+                y=[county_data['C_RaceWhite'].sum(),
+                   county_data['C_RaceBlack'].sum(), county_data['C_HispanicYES'].sum(),
+                   county_data['C_RaceOther'].sum(), minority.sum()])
+    plt.title('Covid Cases by Race')
+    st.pyplot()
+
+    county_data['Minority'] = minority
+
+    fig = px.choropleth(county_data, geojson=counties, locations='COUNTY', color='Minority',
+                        color_continuous_scale="Viridis", hover_name='COUNTYNAME',
+                        hover_data=['T_positive'],
+                        scope="usa",
+                        title="Minority Cases",
+                        range_color=(0, 20000)
+                        )
+    fig.update_geos(
+        projection={'scale': 4},
+        center={'lat': 27.6648, 'lon': -81.5158},
+        visible=False
+    )
+    st.plotly_chart(fig)
+
+    '''
+    We can see from the map that the minority cases near FIU is the highest in the State. With FIU serving primarily minorities this puts our campus at a higher risk of being a hot spot for the spread of the virus if proper precautions are not taken. As we will be seeing students coming from Miami-Dade and Broward which is the largest hot spots in Florida.
+
+    # Respiratory Diseases
+    '''
+
+    fig = px.choropleth(fdoh_data, geojson=counties, locations='FIPS', color='Number of COPD Hospitalizations',
+                        color_continuous_scale="Viridis", hover_name='County',
+                        hover_data=[],
+                        scope="usa",
+                        title='Number of COPD Hospitalizations',
+                        labels={'Number of COPD Hospitalizations': 'COPD Cases'}
+                        )
+    fig.update_geos(
+        projection={'scale': 4},
+        center={'lat': 27.6648, 'lon': -81.5158},
+        visible=False
+    )
+    st.plotly_chart(fig)
+    st.write("*Chronic obstructive pulmonary disease (COPD)")
+
+    fig = px.choropleth(fdoh_data, geojson=counties, locations='FIPS',
+                        color='Number of Asthma Emergency Department Visits',
+                        color_continuous_scale="Viridis", hover_name='County',
+                        hover_data=[],
+                        scope="usa",
+                        title='Number of Asthma Emergency Department Visits',
+                        labels={'Number of Asthma Emergency Department Visits': 'Asthma Cases'}
+                        )
+    fig.update_geos(
+        projection={'scale': 4},
+        center={'lat': 27.6648, 'lon': -81.5158},
+        visible=False
+    )
+    st.plotly_chart(fig)
+
+    fig = px.choropleth(fdoh_data, geojson=counties, locations='FIPS', color='Number of Asthma Hospitalizations',
+                        color_continuous_scale="Viridis", hover_name='County',
+                        hover_data=[],
+                        scope="usa",
+                        title='Number of Asthma Hospitalizations',
+                        labels={'Number of Asthma Hospitalizations': 'Asthma Cases'}
+                        )
+    fig.update_geos(
+        projection={'scale': 4},
+        center={'lat': 27.6648, 'lon': -81.5158},
+        visible=False
+    )
+    st.plotly_chart(fig)
+
+    '''
+    The concentration of respiratory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
+    '''
+
+    '''
+    # Risky Behaviors
+    
+    We will be referencing this [report](https://www.gstatic.com/covid19/mobility/2020-07-27_US_Florida_Mobility_Report_en.pdf)
+    released by google for this section.
+    
+    Taking a look at this report from Google on how these two communities have coped with the virus
+    we can see that people are actively trying to avoid places such as transit stations, parks and
+    following mandated work from home policies. However it's interesting that from the baseline we are
+    seeing only a minor decrease to retail & recreation. We know that the virus is spreading in these
+    two communities and as such we can infer that the hot spot for these transmissions are currently
+    retail & recreation activities and grocery & pharmacy stores. After which it may spread within
+    the household with increased contact.    
+    '''
+    dade = Image.open('../image/dade-mobility.PNG')
+    broward = Image.open('../image/broward-mobility.PNG')
+
+    st.image(dade, caption='Dade Mobility Report',
+             use_column_width=True)
+
+    st.image(broward, caption='Broward Mobility Report',
+             use_column_width=True)
+
+    fig = go.Figure()
+    fig = make_subplots(rows=3, cols=2,
+                        specs=[[{'type': 'domain', 'colspan': 2}, None], [{'type': 'xy'}, {'type': 'xy'}],
+                               [{'type': 'xy', 'colspan': 2}, None]],
+                        subplot_titles=('', 'Testing Results', 'Cases by Race', "Median Age"))
+
+    st.info("Select \"State\" to view the entire State data")
     # Multiselect box
-    county_picker = st.sidebar.multiselect('Select County',
-                                           list(county_data['County_1'].sort_values()),
-                                           ['Dade', 'Broward', 'Monroe', 'Collier']
-                                           )
+    county_picker = st.multiselect('Select County',
+                                   list(county_data['County_1'].sort_values()),
+                                   ['Dade', 'Broward', 'Monroe', 'Collier']
+                                   )
     if "State" in county_picker:
         local_counties_county = pd.DataFrame()
         selected = county_data['County_1'] != 'State'
@@ -113,31 +305,15 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
             selected = county_data['County_1'] == x
             local_counties_county = local_counties_county.append(county_data[selected], ignore_index=True)
 
-    # st.write(county_data) # TODO: Only for debugging; remove
-
     if not county_picker:
         st.write('## **Select a county**')
     else:
-        '''
-        Our analysis on the local covid-19 cases used data gathered from the Florida COVID-19 
-        [data api](https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-cases-by-county).
-        '''
-        fig = go.Figure()
-        fig = make_subplots(rows=3, cols=2,
-                            specs=[[{'type': 'domain'}, {'type': 'domain'}], [{'type': 'xy'}, {'type': 'xy'}],
-                                   [{'type': 'xy', 'colspan': 2}, None]],
-                            subplot_titles=('', '', 'Testing Results', 'Cases by Race', "Median Age"))
-
+        ########
         # Indicator
-        fig.add_trace(go.Indicator(
-            value=local_counties_county['Deaths'].values.sum(),
-            title={"text": "Deaths"},
-            domain={'x': [0, 0.5], 'y': [0.6, 0.5]}), 1, 1)
-
         fig.add_trace(go.Indicator(
             value=local_counties_county['T_positive'].values.sum(),
             title={"text": "Total Positive Cases"},
-            domain={'x': [0.8, 1], 'y': [0, 1]}), 1, 2)
+            domain={'x': [0.8, 1], 'y': [0, 1]}), 1, 1)
 
         # Testing Chart
         fig.add_trace(
@@ -154,7 +330,8 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
 
         # Race Chart
         fig.add_trace(
-            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceWhite'],
+            go.Bar(x=local_counties_county['County_1'],
+                   y=local_counties_county['C_RaceWhite'],
                    marker_color='pink',
                    name='White'), 2, 2)
         fig.add_trace(
@@ -162,8 +339,12 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
                    marker_color='black',
                    name='Black'), 2, 2)
         fig.add_trace(
-            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceOther'],
+            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_HispanicYES'],
                    marker_color='orchid',
+                   name='Hispanic'), 2, 2)
+        fig.add_trace(
+            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceOther'],
+                   marker_color='yellow',
                    name='Other'), 2, 2)
         # Median Age Chart
         fig.add_trace(
@@ -181,11 +362,11 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
         st.plotly_chart(fig)
 
         "From the charts above we can see that there is a significant amount of positive test cases" \
-        "in the area. With schools reopening this Fall this is concerning news that should be taken in to " \
-        "consideration. What is concerning is from the data we have seen that the largest age group is that" \
-        "has been affected are adults above the age of 25 years old. Which indicates that school aged" \
-        "indivuals have not been exposed to the virus due to quarentine efforts. We may see a change in this" \
-        "trend if schools are not prepared to handle large amounts of on campus students."
+        " in the area. With schools reopening this Fall this is concerning news that should be taken in to " \
+        " consideration. What is concerning is from the data we have seen that the largest age group is that" \
+        " has been affected are adults above the age of 25 years old. Which indicates that school aged" \
+        " indivuals have not been exposed to the virus due to quarentine efforts. We may see a change in this" \
+        " trend if schools are not prepared to handle large amounts of on campus students."
 
         # Age group pie chart
         t1 = local_counties_county['Age_0_4'].sum()
@@ -205,36 +386,38 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
                           marker=dict(colors=colors, line=dict(color='#000000', width=1)))
         st.plotly_chart(fig)
 
-        '''
-        The daily number of cases timeline is showing that from July 11 we have seen a drop in the number
-        of cases. Although we are still lacking data we need can see a preliminary signs of a downward
-        trend in the number of cases per day. In the coming months this is something to monitor closely
-        so that FIU may respond with an influx in cases appropriately. 
-        '''
-        # Daily Cases Count
-        df = {"count": state_data['EventDate']}
-        case_timeline = pd.DataFrame(data=df)
-        case_timeline['count'] = pd.to_datetime(case_timeline['count'])
-        case_timeline['date_minus_time'] = case_timeline["count"].apply(lambda case_timeline:
-                                                                        datetime.datetime(year=case_timeline.year,
-                                                                                          month=case_timeline.month,
-                                                                                          day=case_timeline.day))
-        daily_cases = case_timeline.groupby('date_minus_time').count()
-        fig = px.line(daily_cases, x=daily_cases.index, y='count', title='Daily Cases Count',
-                      labels={'date_minus_time': "Date", 'count': 'Count'})
-        st.plotly_chart(fig)
+    '''
+    The concentration of respiratory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
+    '''
 
-        map_data = st.selectbox("Map Select:", (
-            'Deaths', "T_positive", "T_negative", "MedianAge", 'C_RaceWhite', 'C_RaceBlack', 'C_RaceOther'), 0)
-        fig = px.choropleth(local_counties_county, geojson=counties, locations='COUNTY', color=map_data,
-                            color_continuous_scale="Viridis", hover_name='COUNTYNAME',
-                            hover_data=["T_positive", "T_negative"],
-                            scope="usa",
-                            title="Map View"
-                            )
-        fig.update_geos(
-            projection={'scale': 6},
-            center={'lat': 27.6648, 'lon': -81.5158},
-            visible=False
-        )
-        st.plotly_chart(fig)
+    '''
+    # Conclusion
+    
+    From the data we know that South Florida more precisely the Dade and Broward are the two most infected
+    communities. We know that the number of cases is increasing and with schools reopening in a few weeks
+    we need to prepare for how to handle on campus students. As such our solution is to create a monitoring
+    tool which will allow students to track the risk factor of attending classes. This tool will gather 
+    data anonymously and aggregate a risk monitoring dashboard which students may view. The risk factor
+    will be generated the using students personal factors combined with community risk factors. The detail at which
+    administrators would like this dashboard to be would depend on the granularity of the data collected. 
+    We have created a proof of concept of what we think such an application might look like. Depending on
+    various regulation such as HIPPA the data will be stored securely and de-identified for privacy.  
+    '''
+
+    '''
+    # Reference
+    
+    https://dai-global-digital.com/covid-19-data-analysis-part-1-demography-behavior-and-environment.html#Factor-1:-Age
+    https://dai-global-digital.com/covid-19-data-analysis-part-2-health-capacity-and-preparedness.html
+    https://catalyst.nejm.org/doi/full/10.1056/CAT.20.0116
+    https://www.cdc.gov/coronavirus/2019-ncov/community/health-equity/race-ethnicity.html
+    https://www.floridatracking.com/healthtracking/mapview.htm?i=5250&g=3&t=2018&ta=0&it=1
+    https://www.gstatic.com/covid19/mobility/2020-07-27_US_Florida_Mobility_Report_en.pdf
+
+    # Data Source
+
+    ### Data API
+    https://hub.arcgis.com/datasets/61a30fb3ea4c43e4854fbb4c1be57394_0
+    https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-case-line-data/geoservice
+    https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-cases-by-county
+    '''
