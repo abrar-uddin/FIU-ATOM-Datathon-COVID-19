@@ -18,8 +18,12 @@ import geopandas as gpd
 import geoplot as gplt
 
 # Select box to switch between the two pages
-view_picker = st.sidebar.selectbox('Change View', ('Risk Profile Survey', "Daily Risk Profile Survey", "Risk Profile",
-                                                   'Local COVID-19 Cases Analysis'))
+view_picker = st.sidebar.selectbox('Change View', ('Local COVID-19 Cases Analysis',
+                                                   "Risk Profile Dashboard",
+                                                   'Risk Profile Survey',
+                                                   "Daily Risk Profile Survey"
+                                                   )
+                                   )
 
 if view_picker == 'Risk Profile Survey':
     components.iframe(
@@ -34,7 +38,6 @@ elif view_picker == 'Daily Risk Profile Survey':
 elif view_picker == 'Risk Profile':
     st.title('Risk Profile')
     # TODO: put the risk profile code here
-    # TODO: need a way to view individual data, dont bother to make it secure; simple pid lookup should be fine
     # TODO: compare risk profiles by college, county, etc
     # TODO: WE GOT THIS!
     panther_id = st.sidebar.text_input("Panther ID:")
@@ -255,14 +258,22 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.plotly_chart(fig)
 
     '''
-    The concentration of respitatory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
+    The concentration of respiratory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
     '''
 
     '''
     # Risky Behaviors
     
     We will be referencing this [report](https://www.gstatic.com/covid19/mobility/2020-07-27_US_Florida_Mobility_Report_en.pdf)
-    released by google for this section. 
+    released by google for this section.
+    
+    Taking a look at this report from Google on how these two communities have coped with the virus
+    we can see that people are actively trying to avoid places such as transit stations, parks and
+    following mandated work from home policies. However it's interesting that from the baseline we are
+    seeing only a minor decrease to retail & recreation. We know that the virus is spreading in these
+    two communities and as such we can infer that the hot spot for these transmissions are currently
+    retail & recreation activities and grocery & pharmacy stores. After which it may spread within
+    the household with increased contact.    
     '''
     dade = Image.open('../image/dade-mobility.PNG')
     broward = Image.open('../image/broward-mobility.PNG')
@@ -377,11 +388,21 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
         st.plotly_chart(fig)
 
     '''
-    The concentration of respitatory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
+    The concentration of respiratory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
     '''
 
     '''
     # Conclusion
+    
+    From the data we know that South Florida more precisely the Dade and Broward are the two most infected
+    communities. We know that the number of cases is increasing and with schools reopening in a few weeks
+    we need to prepare for how to handle on campus students. As such our solution is to create a monitoring
+    tool which will allow students to track the risk factor of attending classes. This tool will gather 
+    data anonymously and aggregate a risk monitoring dashboard which students may view. The risk factor
+    will be generated the using students personal factors combined with community risk factors. The detail at which
+    administrators would like this dashboard to be would depend on the granularity of the data collected. 
+    We have created a proof of concept of what we think such an application might look like. Depending on
+    various regulation such as HIPPA the data will be stored securely and de-identified for privacy.  
     '''
 
     '''
