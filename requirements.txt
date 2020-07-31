@@ -1,9 +1,9 @@
-pandas==1.0.5
-seaborn==0.10.1
-matplotlib==3.3.0
+requests==2.24.0
+plotly==4.9.0
 streamlit==0.64.0
 geopandas==0.8.1
-plotly==4.8.2
-requests==2.24.0
 geoplot==0.4.1
+seaborn==0.10.1
+matplotlib==3.3.0
+pandas==1.1.0
 Pillow==7.2.0

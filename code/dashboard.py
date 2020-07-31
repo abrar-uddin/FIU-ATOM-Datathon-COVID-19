@@ -11,7 +11,6 @@ import plotly.express as px
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 sns.set()
 
 import geopandas as gpd
