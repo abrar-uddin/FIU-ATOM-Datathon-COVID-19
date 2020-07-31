@@ -1,18 +1,20 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
+
 import requests
+from PIL import Image
+
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
-import geopandas as gpd
-import datetime
+
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 sns.set()
 
+import geopandas as gpd
 import geoplot as gplt
 
 # Select box to switch between the two pages
@@ -93,24 +95,33 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     fl_demo = createGPD(fl_demo_url)
 
     # Environmental/Disease Data
-    fdoh_data = pd.read_csv('C:/Users/uddin/Downloads/FIU-ATOM-Datathon-COVID-19/data/fdoh-data.csv')
+    fdoh_data = pd.read_csv('../data/fdoh-data.csv')
     fdoh_data = fdoh_data.drop([0]).rename(columns={'Unnamed: 0': 'County', 'Unnamed: 1': "FIPS"})
     df = county_data[['County_1', 'SHAPE_Length', 'SHAPE_Area', 'geometry']].rename(
         columns={'County_1': 'County'})
     fdoh_data = pd.merge(fdoh_data, df, on='County')
     fdoh_data['FIPS'] = fdoh_data['FIPS'].apply(lambda x: x.replace('-', ''))
 
-    # fl_demo.head(2)
-    #
-    # county_data.head(2)
-    #
-    # fdoh_data.head(2)
+    '''
+    # Objective
+    
+    Our goal as a team is to identify how can students and FIU partner together to help safely open
+    the campus for classes. 
+    # Assumptions
+    
+    In out analysis we will be looking at county level data to see how prevalent the risk factors
+    as announced by the CDC are in our community. Factors such as:
+    - Age
+    - Ethnicity
+    - Respiratory Diseases
+    - Risky Behavior
+    '''
 
     '''
-        # Assumptions
+    # Age
 
-        Dade and Broward are the most populated areas in Flordia as such we need to take that in to account as we analyze our data.
-        '''
+    Most public health organizations have stated that age is a key indicator of how sick a paitient may get from COVID-19. 60 up tends to be the general age where COVID can pose a high life threatening issue.
+    '''
 
     gplt.choropleth(
         fl_demo, hue='TotalPopul',
@@ -120,10 +131,9 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     )
     plt.title('Total Population')
     st.pyplot()
-    '''
-    # Age
 
-    Most public health organizations have stated that age is a key indicator of how sick a paitient may get from COVID-19. 60 up tends to be the general age where COVID can pose a high life threatening issue.
+    '''
+    Dade and Broward are the most populated areas in Flordia as such we need to take that in to account as we analyze our data.
     '''
 
     gplt.choropleth(
@@ -166,7 +176,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
 
     # Ethnicity
 
-    According to the CDC there does exist a inequality in the system which puts minorities at a higher risk for contracting the virus. This can be due to multiple reasons such as discrimination, healthcare access, occupation, education, housing or all of the above.
+    According to the CDC there does exist an inequality in the system which puts minorities at a higher risk for contracting the virus. This can be due to multiple reasons such as discrimination, healthcare access, occupation, education, housing or all of the above.
     '''
 
     sns.barplot(x=['White', 'Black', 'Hispanic', 'Other'],
@@ -194,7 +204,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.plotly_chart(fig)
 
     '''
-    We can see from the map that the minority cases near FIU is the highest in the State. With FIU serving primarily minorities this puts our campus at a higher risk of being hot spot for the spread of the virus if proper precautions are not taken. With the cases of Miami-Dade and Broward with the highest concentration.
+    We can see from the map that the minority cases near FIU is the highest in the State. With FIU serving primarily minorities this puts our campus at a higher risk of being a hot spot for the spread of the virus if proper precautions are not taken. As we will be seeing students coming from Miami-Dade and Broward which is the largest hot spots in Florida.
 
     # Respiratory Diseases
     '''
@@ -242,6 +252,25 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
         visible=False
     )
     st.plotly_chart(fig)
+
+    '''
+    The concentration of respitatory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
+    '''
+
+    '''
+    # Risky Behaviors
+    
+    We will be referencing this [report](https://www.gstatic.com/covid19/mobility/2020-07-27_US_Florida_Mobility_Report_en.pdf)
+    released by google for this section. 
+    '''
+    dade = Image.open('../image/dade-mobility.PNG')
+    broward = Image.open('../image/broward-mobility.PNG')
+
+    st.image(dade, caption='Dade Mobility Report',
+             use_column_width = True)
+
+    st.image(broward, caption='Broward Mobility Report',
+             use_column_width=True)
 
     fig = go.Figure()
     fig = make_subplots(rows=3, cols=2,
@@ -357,6 +386,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     https://catalyst.nejm.org/doi/full/10.1056/CAT.20.0116
     https://www.cdc.gov/coronavirus/2019-ncov/community/health-equity/race-ethnicity.html
     https://www.floridatracking.com/healthtracking/mapview.htm?i=5250&g=3&t=2018&ta=0&it=1
+    https://www.gstatic.com/covid19/mobility/2020-07-27_US_Florida_Mobility_Report_en.pdf
 
     # Data Source
 
