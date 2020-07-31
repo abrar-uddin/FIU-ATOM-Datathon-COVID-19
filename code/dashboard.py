@@ -35,16 +35,15 @@ elif view_picker == 'Daily Risk Profile Survey':
         'https://docs.google.com/forms/d/e/1FAIpQLSe1RYfDpImWdoHulRn4uYVP5aLnfCxfTwyGBvsplZ4GFugfnQ/viewform?embedded=true',
         scrolling=True,
         height=800)
-elif view_picker == 'Risk Profile':
+elif view_picker == 'Risk Profile Dashboard':
     st.title('Risk Profile')
     # TODO: put the risk profile code here
     # TODO: compare risk profiles by college, county, etc
-    panther_id = st.sidebar.text_input("Panther ID:")
     components.iframe(
-        'https://public.tableau.com/views/FarenetAnomalies/AnomaliesDashboard?:showVizHome=no&:embed=true',
+        'https://public.tableau.com/views/DailyRiskSurvey/Dashboard1?:showVizHome=no&:embed=true',
         scrolling=True,
         height=900,
-        width=1500)
+        width=1000)
 elif view_picker == 'Local COVID-19 Cases Analysis':
     st.title('Local COVID-19 Cases Analysis')
 
