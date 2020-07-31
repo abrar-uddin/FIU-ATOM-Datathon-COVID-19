@@ -9,9 +9,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
 
-
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 sns.set()
 
 import geopandas as gpd
@@ -179,14 +179,15 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     According to the CDC there does exist an inequality in the system which puts minorities at a higher risk for contracting the virus. This can be due to multiple reasons such as discrimination, healthcare access, occupation, education, housing or all of the above.
     '''
 
-    sns.barplot(x=['White', 'Black', 'Hispanic', 'Other'],
-                y=[county_data['C_RaceWhite'].sum() - county_data['C_HispanicYES'].sum(),
+    minority = county_data['C_RaceBlack'] + county_data['C_HispanicYES'] + county_data['C_RaceOther']
+
+    sns.barplot(x=['White', 'Black', 'Hispanic', 'Other', 'Combined Minority'],
+                y=[county_data['C_RaceWhite'].sum(),
                    county_data['C_RaceBlack'].sum(), county_data['C_HispanicYES'].sum(),
-                   county_data['C_RaceOther'].sum()])
+                   county_data['C_RaceOther'].sum(), minority.sum()])
     plt.title('Covid Cases by Race')
     st.pyplot()
 
-    minority = county_data['C_RaceBlack'] + county_data['C_HispanicYES'] + county_data['C_RaceOther']
     county_data['Minority'] = minority
 
     fig = px.choropleth(county_data, geojson=counties, locations='COUNTY', color='Minority',
@@ -267,7 +268,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     broward = Image.open('../image/broward-mobility.PNG')
 
     st.image(dade, caption='Dade Mobility Report',
-             use_column_width = True)
+             use_column_width=True)
 
     st.image(broward, caption='Broward Mobility Report',
              use_column_width=True)
@@ -276,7 +277,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     fig = make_subplots(rows=3, cols=2,
                         specs=[[{'type': 'domain', 'colspan': 2}, None], [{'type': 'xy'}, {'type': 'xy'}],
                                [{'type': 'xy', 'colspan': 2}, None]],
-                        subplot_titles=('', '', 'Testing Results', 'Cases by Race', "Median Age"))
+                        subplot_titles=('', 'Testing Results', 'Cases by Race', "Median Age"))
 
     st.info("Select \"State\" to view the entire State data")
     # Multiselect box
@@ -319,7 +320,8 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
 
         # Race Chart
         fig.add_trace(
-            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceWhite'],
+            go.Bar(x=local_counties_county['County_1'],
+                   y=local_counties_county['C_RaceWhite'],
                    marker_color='pink',
                    name='White'), 2, 2)
         fig.add_trace(
@@ -327,8 +329,12 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
                    marker_color='black',
                    name='Black'), 2, 2)
         fig.add_trace(
-            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceOther'],
+            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_HispanicYES'],
                    marker_color='orchid',
+                   name='Hispanic'), 2, 2)
+        fig.add_trace(
+            go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceOther'],
+                   marker_color='yellow',
                    name='Other'), 2, 2)
         # Median Age Chart
         fig.add_trace(
