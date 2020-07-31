@@ -1,3 +1,4 @@
 .
 !/code
-*.ipynb
+!/image
+!/data
