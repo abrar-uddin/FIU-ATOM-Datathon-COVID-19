@@ -108,15 +108,16 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     # Objective
     
     Our goal as a team is to identify how can students and FIU partner together to help safely open
-    the campus for classes. 
+    the campus for classes.
     # Assumptions
     
-    In out analysis we will be looking at county level data to see how prevalent the risk factors
+    In our analysis we will be looking at county level data to see how prevalent the risk factors
     as announced by the CDC are in our community. Factors such as:
     - Age
     - Ethnicity
     - Respiratory Diseases
     - Risky Behavior
+    - Current Situation
     '''
 
     '''
@@ -135,7 +136,8 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.pyplot()
 
     '''
-    Dade and Broward are the most populated areas in Flordia as such we need to take that in to account as we analyze our data.
+    Dade and Broward are the most populated areas in Flordia as such we would expect the spread to be 
+    centered around these two counties.
     '''
 
     gplt.choropleth(
@@ -148,7 +150,9 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.pyplot()
 
     '''
-    From this chart we can see that the two counties near FIU Broward and Dade have the largest population of people over the age of 65. One thing to note is that the data used was collected 5 years ago.
+    From this chart we can see that the two counties near FIU Broward and Dade also has the largest 
+    population of people over the age of 65. One thing to note is that the data used was collected 
+    5 years ago.
     '''
 
     sns.barplot(x=['0-4', '5-14', '15-24', '25-34', '35-44', '45-54', '55-64', '65-74', '85plus'],
@@ -174,11 +178,18 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.plotly_chart(fig)
 
     '''
-    From the data we can see that the largest age range that has tested positive for COVID-19 is 25 up but more importantly the area aroud FIU is a hotspot. As such taking age in to considerations people older that 60 should remain in quarantine with schools opening we will see an influx in cases starting at a much younger age which could have unforeseen consequences.
+    From the data we can see that the largest age range that has tested positive for COVID-19 is 25 
+    up but more importantly the area aroud FIU is a hotspot. As such taking age in to considerations 
+    people older that 60 should remain in quarantine with schools opening we will see an influx in 
+    cases starting at a much younger age which could have unforeseen consequences. The risk index for
+    anyone above the age of 60 would be high and depending on underlying health conditions younger
+    individuals will need to be classified. 
 
     # Ethnicity
 
-    According to the CDC there does exist an inequality in the system which puts minorities at a higher risk for contracting the virus. This can be due to multiple reasons such as discrimination, healthcare access, occupation, education, housing or all of the above.
+    According to the CDC there does exist an inequality in the system which puts minorities at a 
+    higher risk for contracting the virus. This can be due to multiple reasons such as discrimination, 
+    health care access, occupation, education, housing or all of the above.
     '''
 
     minority = county_data['C_RaceBlack'] + county_data['C_HispanicYES'] + county_data['C_RaceOther']
@@ -207,9 +218,16 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.plotly_chart(fig)
 
     '''
-    We can see from the map that the minority cases near FIU is the highest in the State. With FIU serving primarily minorities this puts our campus at a higher risk of being a hot spot for the spread of the virus if proper precautions are not taken. As we will be seeing students coming from Miami-Dade and Broward which is the largest hot spots in Florida.
+    We can see from the map that the minority cases near FIU is the highest in the State. With FIU 
+    serving primarily minorities this puts our campus at a higher risk of being a hot spot for the 
+    spread of the virus if proper precautions are not taken. As we will be seeing students coming 
+    from Miami-Dade and Broward which are the largest hot spots in Florida.
 
     # Respiratory Diseases
+    
+    Various underlying health issues can increase the risk factor for an individual significantly we will
+    take a look at the respiratory disease as a base line for its the one that aligns most closely with
+    the symptoms of the virus.    
     '''
 
     fig = px.choropleth(fdoh_data, geojson=counties, locations='FIPS', color='Number of COPD Hospitalizations',
@@ -257,7 +275,11 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.plotly_chart(fig)
 
     '''
-    The concentration of respiratory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
+    The concentration of respiratory illness taken from 2018 data as shown above is centered around 
+    Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism 
+    however taking a look at the hospitalizations we can see that there is a high probability that a 
+    person who has a respiratory illness is in the Dade and Broward areas which significantly increases 
+    their risk index from COVID.
     '''
 
     '''
@@ -283,13 +305,26 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.image(broward, caption='Broward Mobility Report',
              use_column_width=True)
 
+    '''
+    The concentration of respiratory illness taken from 2018 data as shown above is centered around 
+    Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism 
+    however taking a look at the hospitalizations we can see that there is a high probability that a 
+    person who has a respiratory illness is in the Dade and Broward areas which significantly increases 
+    their risk index from COVID.
+    '''
+
+    '''
+    # Current Situation
+    
+    Below is a quick snapshot of the current COVID-19 data.
+    '''
+    st.info("Select \"State\" to view the entire State data")
     fig = go.Figure()
     fig = make_subplots(rows=3, cols=2,
                         specs=[[{'type': 'domain', 'colspan': 2}, None], [{'type': 'xy'}, {'type': 'xy'}],
                                [{'type': 'xy', 'colspan': 2}, None]],
                         subplot_titles=('', 'Testing Results', 'Cases by Race', "Median Age"))
 
-    st.info("Select \"State\" to view the entire State data")
     # Multiselect box
     county_picker = st.multiselect('Select County',
                                    list(county_data['County_1'].sort_values()),
@@ -361,13 +396,14 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
                           )
         st.plotly_chart(fig)
 
-        "From the charts above we can see that there is a significant amount of positive test cases" \
-        " in the area. With schools reopening this Fall this is concerning news that should be taken in to " \
-        " consideration. What is concerning is from the data we have seen that the largest age group is that" \
-        " has been affected are adults above the age of 25 years old. Which indicates that school aged" \
-        " indivuals have not been exposed to the virus due to quarentine efforts. We may see a change in this" \
-        " trend if schools are not prepared to handle large amounts of on campus students."
-
+        '''
+        From the charts above we can see that there is a significant amount of positive test cases
+        in the area. With schools reopening this Fall this is concerning news that should be taken in to
+        consideration. What is concerning is from the data we have seen that the largest age group is that
+        has been affected are adults above the age of 25 years old. Which indicates that school aged
+        individuals have not been exposed to the virus due to quarantine efforts. We may see a change in this
+        trend if schools are not prepared to handle large amounts of on campus students.
+        '''
         # Age group pie chart
         t1 = local_counties_county['Age_0_4'].sum()
         t2 = local_counties_county['Age_5_14'].sum()
@@ -387,10 +423,6 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
         st.plotly_chart(fig)
 
     '''
-    The concentration of respiratory illness taken from 2018 data as shown above is centered around Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism however taking a look at the hospitalizations we can see that there is a high probability that a person who has a respiratory illness is in the Dade and Broward areas which significantly increases their risk index from COVID.
-    '''
-
-    '''
     # Conclusion
     
     From the data we know that South Florida more precisely the Dade and Broward are the two most infected
@@ -407,17 +439,16 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     '''
     # Reference
     
-    https://dai-global-digital.com/covid-19-data-analysis-part-1-demography-behavior-and-environment.html#Factor-1:-Age
-    https://dai-global-digital.com/covid-19-data-analysis-part-2-health-capacity-and-preparedness.html
-    https://catalyst.nejm.org/doi/full/10.1056/CAT.20.0116
-    https://www.cdc.gov/coronavirus/2019-ncov/community/health-equity/race-ethnicity.html
-    https://www.floridatracking.com/healthtracking/mapview.htm?i=5250&g=3&t=2018&ta=0&it=1
-    https://www.gstatic.com/covid19/mobility/2020-07-27_US_Florida_Mobility_Report_en.pdf
+    - https://dai-global-digital.com/covid-19-data-analysis-part-1-demography-behavior-and-environment.html#Factor-1:-Age
+    - https://dai-global-digital.com/covid-19-data-analysis-part-2-health-capacity-and-preparedness.html
+    - https://catalyst.nejm.org/doi/full/10.1056/CAT.20.0116
+    - https://www.cdc.gov/coronavirus/2019-ncov/community/health-equity/race-ethnicity.html
 
     # Data Source
 
-    ### Data API
-    https://hub.arcgis.com/datasets/61a30fb3ea4c43e4854fbb4c1be57394_0
-    https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-case-line-data/geoservice
-    https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-cases-by-county
+    - https://hub.arcgis.com/datasets/61a30fb3ea4c43e4854fbb4c1be57394_0    
+    - https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-case-line-data/geoservice
+    - https://open-fdoh.hub.arcgis.com/datasets/florida-covid19-cases-by-county
+    - https://www.floridatracking.com/healthtracking/mapview.htm?i=5250&g=3&t=2018&ta=0&it=1
+    - https://www.gstatic.com/covid19/mobility/2020-07-27_US_Florida_Mobility_Report_en.pdf
     '''
