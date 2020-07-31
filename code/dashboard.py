@@ -39,7 +39,6 @@ elif view_picker == 'Risk Profile':
     st.title('Risk Profile')
     # TODO: put the risk profile code here
     # TODO: compare risk profiles by college, county, etc
-    # TODO: WE GOT THIS!
     panther_id = st.sidebar.text_input("Panther ID:")
     components.iframe(
         'https://public.tableau.com/views/FarenetAnomalies/AnomaliesDashboard?:showVizHome=no&:embed=true',
