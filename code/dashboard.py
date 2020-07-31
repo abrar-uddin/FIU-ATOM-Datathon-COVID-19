@@ -36,11 +36,14 @@ elif view_picker == 'Daily Risk Profile Survey':
         scrolling=True,
         height=800)
 elif view_picker == 'Risk Profile Dashboard':
-    st.title('Risk Profile')
-    # TODO: put the risk profile code here
-    # TODO: compare risk profiles by college, county, etc
+    st.title('Risk Profile Dashboard')
     components.iframe(
-        'https://public.tableau.com/views/DailyRiskSurvey/Dashboard1?:showVizHome=no&:embed=true',
+        'https://public.tableau.com/views/Daily_Risk_Survey/Dashboard1?:showVizHome=no&:embed=true',
+        scrolling=True,
+        height=900,
+        width=1000)
+    components.iframe(
+        'https://public.tableau.com/views/Risk_Profile/Dashboard1?:showVizHome=no&:embed=true',
         scrolling=True,
         height=900,
         width=1000)
