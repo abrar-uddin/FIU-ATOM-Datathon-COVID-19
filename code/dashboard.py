@@ -37,12 +37,12 @@ elif view_picker == 'Daily Risk Profile Survey':
 elif view_picker == 'Risk Profile Dashboard':
     st.title('Risk Profile Dashboard')
     components.iframe(
-        'https://public.tableau.com/views/Daily_Risk_Survey/Dashboard1?:showVizHome=no&:embed=true',
+        'https://public.tableau.com/views/Risk_Profile2_0/Dashboard1?:showVizHome=no&:embed=true',
         scrolling=True,
         height=900,
         width=1000)
     components.iframe(
-        'https://public.tableau.com/views/Risk_Profile/Dashboard1?:showVizHome=no&:embed=true',
+        'https://public.tableau.com/views/New_Daily/DailyProfile?:showVizHome=no&:embed=true',
         scrolling=True,
         height=900,
         width=1000)
@@ -422,6 +422,9 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
         fig.update_traces(hoverinfo='label', textinfo='percent', textfont_size=15,
                           marker=dict(colors=colors, line=dict(color='#000000', width=1)))
         st.plotly_chart(fig)
+
+        cases_by_zip = Image.open('../image/cases_zip.PNG')
+        st.image(cases_by_zip, caption='Positive Cases by Zip')
 
     '''
     # Conclusion
