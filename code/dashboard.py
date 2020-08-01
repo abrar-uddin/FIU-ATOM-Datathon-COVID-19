@@ -41,6 +41,9 @@ elif view_picker == 'Risk Profile Dashboard':
         scrolling=True,
         height=900,
         width=1000)
+    '''
+    # Daily
+    '''
     components.iframe(
         'https://public.tableau.com/views/New_Daily/DailyProfile?:showVizHome=no&:embed=true',
         scrolling=True,
