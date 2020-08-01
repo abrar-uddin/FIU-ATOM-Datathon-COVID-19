@@ -1,0 +1,6 @@
+Cython==0.29.21
+pyshp==2.1.0
+six==1.15.0
+numpy==1.19.1
+wheel==0.34.2
+Shapely==1.7.0
