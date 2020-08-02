@@ -202,7 +202,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
                 y=[county_data['C_RaceWhite'].sum(),
                    county_data['C_RaceBlack'].sum(), county_data['C_HispanicYES'].sum(),
                    county_data['C_RaceOther'].sum(), minority.sum()])
-    plt.title('Covid Cases by Race')
+    plt.title('COVID Cases by Race')
     st.pyplot()
 
     county_data['Minority'] = minority
@@ -222,7 +222,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.plotly_chart(fig)
 
     '''
-    We can see from the map that the minority cases near FIU is the highest in the State. With FIU 
+    We can see from the map that the cases for minorities near FIU is the highest in the State. With FIU 
     serving primarily minorities this puts our campus at a higher risk of being a hot spot for the 
     spread of the virus if proper precautions are not taken. As we will be seeing students coming 
     from Miami-Dade and Broward which are the largest hot spots in Florida.
