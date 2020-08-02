@@ -127,8 +127,8 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     '''
     # Age
 
-    Most public health organizations have stated that age is a key indicator of how sick a paitient may get from COVID-19. 60 up tends to be the general age where COVID can pose a high life threatening issue.
-    '''
+    Most public health organizations have stated that age is a key indicator of how sick a patient may get from 
+    COVID-19. 60 up tends to be the general age where COVID can pose a high life threatening issue. '''
 
     gplt.choropleth(
         fl_demo, hue='TotalPopul',
@@ -140,7 +140,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.pyplot()
 
     '''
-    Dade and Broward are the most populated areas in Flordia as such we would expect the spread to be 
+    Dade and Broward are the most populated areas in Florida as such we would expect the spread to be 
     centered around these two counties.
     '''
 
@@ -183,8 +183,8 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
 
     '''
     From the data we can see that the largest age range that has tested positive for COVID-19 is 25 
-    up but more importantly the area aroud FIU is a hotspot. As such taking age in to considerations 
-    people older that 60 should remain in quarantine with schools opening we will see an influx in 
+    up but more importantly the area around FIU is a hot spot. As such taking age in to consideration
+    people older than 60 should remain in quarantine with schools opening we will see an influx in 
     cases starting at a much younger age which could have unforeseen consequences. The risk index for
     anyone above the age of 60 would be high and depending on underlying health conditions younger
     individuals will need to be classified. 
