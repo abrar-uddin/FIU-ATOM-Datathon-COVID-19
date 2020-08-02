@@ -350,13 +350,16 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
         fig.add_trace(
             go.Bar(x=local_counties_county['County_1'], y=local_counties_county['T_positive'],
                    marker_color='crimson',
+                   legendgroup="testing",
                    name='Positive'), 2, 1)
         fig.add_trace(
             go.Bar(x=local_counties_county['County_1'], y=local_counties_county['T_negative'],
                    marker_color='green',
+                   legendgroup="testing",
                    name='Negative'), 2, 1)
         fig.add_trace(go.Bar(x=local_counties_county['County_1'], y=local_counties_county['Deaths'],
                              marker_color='grey',
+                             legendgroup="testing",
                              name='Deaths'), 2, 1)
 
         # Race Chart
@@ -364,23 +367,28 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
             go.Bar(x=local_counties_county['County_1'],
                    y=local_counties_county['C_RaceWhite'],
                    marker_color='pink',
+                   legendgroup="race",
                    name='White'), 2, 2)
         fig.add_trace(
             go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceBlack'],
                    marker_color='black',
+                   legendgroup="race",
                    name='Black'), 2, 2)
         fig.add_trace(
             go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_HispanicYES'],
                    marker_color='orchid',
+                   legendgroup="race",
                    name='Hispanic'), 2, 2)
         fig.add_trace(
             go.Bar(x=local_counties_county['County_1'], y=local_counties_county['C_RaceOther'],
                    marker_color='yellow',
+                   legendgroup="race",
                    name='Other'), 2, 2)
         # Median Age Chart
         fig.add_trace(
             go.Bar(x=local_counties_county['County_1'], y=local_counties_county['MedianAge'],
                    marker_color='darkturquoise',
+                   legendgroup="age",
                    name='Median Age'), 3, 1)
         fig.update_layout(height=800, width=800,
                           legend=dict(
