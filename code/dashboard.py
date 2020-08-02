@@ -223,13 +223,13 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
 
     '''
     We can see from the map that the cases for minorities near FIU is the highest in the State. With FIU 
-    serving primarily minorities this puts our campus at a higher risk of being a hot spot for the 
-    spread of the virus if proper precautions are not taken. As we will be seeing students coming 
-    from Miami-Dade and Broward which are the largest hot spots in Florida.
+    serving primarily minorities, this puts our campus at a higher risk of being a hot spot for the 
+    spread of the virus. As we will be seeing students coming from Miami-Dade and Broward which are the largest hot 
+    spots in Florida. Which means we have to take the proper precautions as we reopen the campus.
 
     # Respiratory Diseases
     
-    Various underlying health issues can increase the risk factor for an individual significantly we will
+    Various underlying health issues can increase the risk factor for an individual significantly. We will
     take a look at the respiratory disease as a base line for its the one that aligns most closely with
     the symptoms of the virus.    
     '''
@@ -279,8 +279,8 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     st.plotly_chart(fig)
 
     '''
-    The concentration of respiratory illness taken from 2018 data as shown above is centered around 
-    Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism 
+    The highest of respiratory illness taken from 2018 data as shown above is centered around 
+    Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism, 
     however taking a look at the hospitalizations we can see that there is a high probability that a 
     person who has a respiratory illness is in the Dade and Broward areas which significantly increases 
     their risk index from COVID.
@@ -290,14 +290,14 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     # Risky Behaviors
     
     We will be referencing this [report](https://www.gstatic.com/covid19/mobility/2020-07-27_US_Florida_Mobility_Report_en.pdf)
-    released by google for this section.
+    released by Google for this section.
     
-    Taking a look at this report from Google on how these two communities have coped with the virus
+    Taking a look at this report on how these two communities have coped with the virus,
     we can see that people are actively trying to avoid places such as transit stations, parks and
-    following mandated work from home policies. However it's interesting that from the baseline we are
+    following mandated work from home policies. However, it's interesting that from the baseline we are
     seeing only a minor decrease to retail & recreation. We know that the virus is spreading in these
     two communities and as such we can infer that the hot spot for these transmissions are currently
-    retail & recreation activities and grocery & pharmacy stores. After which it may spread within
+    "retail & recreation" activities and "grocery & pharmacy" stores. After which it may spread within
     the household with increased contact.    
     '''
     dade = Image.open('../image/dade-mobility.PNG')
@@ -308,14 +308,6 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
 
     st.image(broward, caption='Broward Mobility Report',
              use_column_width=True)
-
-    '''
-    The concentration of respiratory illness taken from 2018 data as shown above is centered around 
-    Dade and Broward areas. The number of ER room visits should be looked at with a bit of skepticism 
-    however taking a look at the hospitalizations we can see that there is a high probability that a 
-    person who has a respiratory illness is in the Dade and Broward areas which significantly increases 
-    their risk index from COVID.
-    '''
 
     '''
     # Current Situation
@@ -403,10 +395,10 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
         '''
         From the charts above we can see that there is a significant amount of positive test cases
         in the area. With schools reopening this Fall this is concerning news that should be taken in to
-        consideration. What is concerning is from the data we have seen that the largest age group is that
-        has been affected are adults above the age of 25 years old. Which indicates that school aged
-        individuals have not been exposed to the virus due to quarantine efforts. We may see a change in this
-        trend if schools are not prepared to handle large amounts of on campus students.
+        consideration. What is concerning from the data is that the largest group affected falls in the category of 
+        above 25. Which indicates that school aged individuals have not been exposed to the virus due to quarantine 
+        efforts. We may see a change in this trend if schools are not prepared to handle large amounts of on campus 
+        students.
         '''
         # Age group pie chart
         t1 = local_counties_county['Age_0_4'].sum()
@@ -432,13 +424,13 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     '''
     # Conclusion
     
-    From the data we know that South Florida more precisely the Dade and Broward are the two most infected
-    communities. We know that the number of cases is increasing and with schools reopening in a few weeks
+    From the data, we know that South Florida, more precisely the Dade and Broward counties are the two most infected
+    communities. We know that the number of cases is increasing and with schools reopening in a few weeks,
     we need to prepare for how to handle on campus students. As such our solution is to create a monitoring
     tool which will allow students to track the risk factor of attending classes. This tool will gather 
     data anonymously and aggregate a risk monitoring dashboard which students may view. The risk factor
-    will be generated the using students personal factors combined with community risk factors. The detail at which
-    administrators would like this dashboard to be would depend on the granularity of the data collected. 
+    will be generated using students personal factors combined with community risk factors. The detail at which
+    administrators would like this dashboard to be, would depend on the granularity of the data collected. 
     We have created a proof of concept of what we think such an application might look like. With the goal
     that administration can use this data as a guide for campus safety and students for risk management.  
     '''
