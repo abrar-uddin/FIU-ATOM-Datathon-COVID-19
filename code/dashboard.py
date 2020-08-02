@@ -431,7 +431,7 @@ elif view_picker == 'Local COVID-19 Cases Analysis':
     data anonymously and aggregate a risk monitoring dashboard which students may view. The risk factor
     will be generated using students personal factors combined with community risk factors. The detail at which
     administrators would like this dashboard to be, would depend on the granularity of the data collected. 
-    We have created a proof of concept of what we think such an application might look like. With the goal
+    We have created a proof of concept of what we think such an application might look like. The goal being
     that administration can use this data as a guide for campus safety and students for risk management.  
     '''
 
