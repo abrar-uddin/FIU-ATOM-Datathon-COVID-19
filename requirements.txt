@@ -6,4 +6,4 @@ geoplot==0.4.1
 seaborn==0.10.1
 matplotlib==3.3.0
 pandas==1.1.0
-Pillow==7.2.0
+Pillow==9.0.1
