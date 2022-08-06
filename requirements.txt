@@ -1,6 +1,6 @@
 requests==2.24.0
 plotly==4.9.0
-streamlit==0.64.0
+streamlit==1.11.1
 geopandas==0.8.1
 geoplot==0.4.1
 seaborn==0.10.1
