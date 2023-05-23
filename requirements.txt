@@ -1,4 +1,4 @@
-requests==2.24.0
+requests==2.31.0
 plotly==4.9.0
 streamlit==0.64.0
 geopandas==0.8.1
